@@ -36,7 +36,7 @@ if __name__ == '__main__':
     bin_code = test[offsetIdx] & 0x7f << 24 |\
         test[offsetIdx + 1]  & 0xff << 16 |\
         test[offsetIdx + 2]  & 0xff << 8 |\
-        test[offsetIdx + 4]  & 0xff§
+        test[offsetIdx + 4]  & 0xff
     num = bin_code % 1000000
     print('str')
     print(str(num))
