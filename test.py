@@ -2,14 +2,14 @@ import hmac, base64, struct, hashlib, time
 import pyotp,sys
 
 def get_hotp_token(secret, intervals_no):
-    # key = base64.b32decode(secret, True)
+    key = base64.b32decode(secret, True)
+    print(key)
+    print(bytes(secret,'utf-8'))
     #decoding our key
     # key = bytes(secret,'utf-8')
     msg = struct.pack(">Q", intervals_no)
     #conversions between Python values and C structs represente
-    h = hmac.new(secret, msg, hashlib.sha1).digest()
-    print('siiiiize\n')
-    print(sys.getsizeof(h))
+    h = hmac.new(key, msg, hashlib.sha1).digest()
     o = h[-1] & 15
     #Generate a hash using both of these. Hashing algorithm is HMAC
     h = (struct.unpack(">I", h[o:o+4])[0] & 0x7fffffff) % 1000000
@@ -26,7 +26,7 @@ def get_totp_token(secret):
 #base64 encoded key
 secret = 'MNUGC2DBGBZQ===='
 key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-print(get_totp_token(bytes(key,'utf-8')))
-totp = pyotp.TOTP(bytes(key,'utf-8'))
+print(get_totp_token(secret))
+totp = pyotp.TOTP(secret)
 print('totp.now()')
 print(totp.now())
