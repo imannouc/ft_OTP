@@ -9,6 +9,7 @@ import struct
 import pyotp
 import oathtool
 from cryptography.fernet import Fernet
+import qrcode
 
 master_key = b'Ks1Aq6pbmXJbopmn_kKetz-P6KJkemGWJx9JzGjIj3U='
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
             with open(args.g, 'r') as f:
                 hexMsg = f.read()
             check_hex_msg(hexMsg)
-            print(hexMsg,'is good')
+            print('Key was successfully saved in ft_otp.key.')
             f = Fernet(master_key)
             encryptedMsg = f.encrypt(bytes(hexMsg,'utf-8'))
             with open('ft_otp.key','w') as f:
@@ -64,8 +65,16 @@ if __name__ == '__main__':
             # print('encryptedMsg : ', encryptedMsg)
             hexMsgBytes = f.decrypt(encryptedMsg)
             hexMsg = hexMsgBytes.decode()
+            print('hexMsgBytes : ', hexMsgBytes)
+            print('hexMsg : ', hexMsg)
+            # hexMsg = base64.b32encode(bytes.fromhex(hexMsg))
             # print('hexMsgBytes : ', hexMsgBytes)
-            # print('hexMsg : ', hexMsg)
+            # print('hexMsg : ', bytes.decode(hexMsg))
+            # uri = pyotp.totp.TOTP(hexMsg).provisioning_uri(name='testOtp',issuer_name='ft_otp')
+            # print('uri',uri)
+            uri = f"otpauth://totp/:ft_otp?secret={hexMsg}&issuer=ft_otp"
+            t = qrcode.make(uri)
+            t.save('qrcode.png')
             ft_otp(hexMsg)
         except Exception as e:
             print(e)
