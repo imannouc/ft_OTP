@@ -8,7 +8,7 @@ import base64
 import struct
 import pyotp
 import oathtool
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet,InvalidToken
 import qrcode
 
 master_key = b'Ks1Aq6pbmXJbopmn_kKetz-P6KJkemGWJx9JzGjIj3U='
@@ -66,6 +66,7 @@ if __name__ == '__main__':
             hexMsgBytes = f.decrypt(encryptedMsg)
             hexMsg = hexMsgBytes.decode()
             # uri = pyotp.totp.TOTP(hexMsg).provisioning_uri(name='testOtp',issuer_name='ft_otp')
+            hexMsg = base64.b32encode(hexMsg.encode()).decode()
             uri = f"otpauth://totp/:ft_otp?secret={hexMsg}&issuer=ft_otp"
             t = qrcode.make(uri)
             t.save('qrcode.png')
@@ -73,5 +74,5 @@ if __name__ == '__main__':
             # Check using pyotp :
             # totp = pyotp.TOTP(hexMsg)
             # print('totp.now()',totp.now())
-        except Exception as e:
+        except (InvalidToken,TypeError,Exception) as e:
             print(e)
