@@ -1,4 +1,4 @@
-# /goinfre/ismannou/miniconda3/envs/42AI-ismannou/bin/python for later
+#!/goinfre/ismannou/miniconda3/envs/42AI-ismannou/bin/python
 from time import time
 import argparse
 import hmac
@@ -14,7 +14,8 @@ import qrcode
 master_key = b'Ks1Aq6pbmXJbopmn_kKetz-P6KJkemGWJx9JzGjIj3U='
 
 def ft_otp(secret):
-    key = base64.b32decode(testkey, True)
+    '''generate a totp and print it'''
+    key = base64.b32decode(secret, True)
     timeFactor = int(time()) // 30
     timeBytes = struct.pack(">Q",timeFactor)
     # '>' : Big Endian.
@@ -25,6 +26,7 @@ def ft_otp(secret):
     print(f"{code:06}")
 
 def check_hex_msg(hexMsg):
+    '''check that hexMsg is in hexadecimal and at least 64 characters'''
     try:
         int(hexMsg,16)
         if (len(hexMsg) < 64):
@@ -34,17 +36,16 @@ def check_hex_msg(hexMsg):
         exit(2)
 
 if __name__ == '__main__':
-    secret = 'MNUGC2DBGBZQ===='
-    # just a 64 byte hex code
-    testkey = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaf"
+    usage = "usage: ft_otp [-h] [-g G | -k K]"
     parser = argparse.ArgumentParser(description='WHATEVER')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-g',type=str,help='takes a .hex file that contains a hexadecimal password with at least 64 bytes. And generates an encrypted .key file from it.')
-    group.add_argument('-k',type=str,help='takes a .key file and generates a new OTP and displays it in the standard output')
+    group.add_argument('-k',type=str,help='takes a .key file and generates a new TOTP and displays it in the standard output')
     args = parser.parse_args()
-    if (args.g != None):
-        pass
-        # go open .hex file, read it, encrypt it,open a .key file ,write the encrypted msg in a .key file
+    if (args.g == None and args.k == None):
+        print(usage)
+    elif (args.g != None):
+        # open .hex file, read it, encrypt it,open a .key file ,write the encrypted msg in a .key file
         try:
             with open(args.g, 'r') as f:
                 hexMsg = f.read()
@@ -57,32 +58,20 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
     elif(args.k != None):
-        # go open .key file, read it, decrypt it, obtain the hex , pass the hex to ft_otp
+        # open .key file, read it, decrypt it, obtain the hex , pass the hex to ft_otp
         try:
             with open(args.k) as f:
                 encryptedMsg = f.read()
             f = Fernet(master_key)
-            # print('encryptedMsg : ', encryptedMsg)
             hexMsgBytes = f.decrypt(encryptedMsg)
             hexMsg = hexMsgBytes.decode()
-            print('hexMsgBytes : ', hexMsgBytes)
-            print('hexMsg : ', hexMsg)
-            # hexMsg = base64.b32encode(bytes.fromhex(hexMsg))
-            # print('hexMsgBytes : ', hexMsgBytes)
-            # print('hexMsg : ', bytes.decode(hexMsg))
             # uri = pyotp.totp.TOTP(hexMsg).provisioning_uri(name='testOtp',issuer_name='ft_otp')
-            # print('uri',uri)
             uri = f"otpauth://totp/:ft_otp?secret={hexMsg}&issuer=ft_otp"
             t = qrcode.make(uri)
             t.save('qrcode.png')
             ft_otp(hexMsg)
+            # Check using pyotp :
+            # totp = pyotp.TOTP(hexMsg)
+            # print('totp.now()',totp.now())
         except Exception as e:
             print(e)
-
-
-    # totp = pyotp.TOTP(key)
-    # print('totp.now()')
-    # print(totp.now())
-
-
-    # print(oathtool.generate_otp(key))–––
