@@ -37,7 +37,7 @@ def check_hex_msg(hexMsg):
 
 if __name__ == '__main__':
     usage = "usage: ft_otp [-h] [-g G | -k K]"
-    parser = argparse.ArgumentParser(description='WHATEVER')
+    parser = argparse.ArgumentParser(description='generate a time-based one time password')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-g',type=str,help='takes a .hex file that contains a hexadecimal password with at least 64 bytes. And generates an encrypted .key file from it.')
     group.add_argument('-k',type=str,help='takes a .key file and generates a new TOTP and displays it in the standard output')
