@@ -5,7 +5,7 @@ import hmac
 import hashlib
 import sys
 import base64
-import struct
+import struct 
 import pyotp
 from cryptography.fernet import Fernet,InvalidToken
 import qrcode
